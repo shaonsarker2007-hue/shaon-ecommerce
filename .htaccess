@@ -1,0 +1,14 @@
+# Serve the Laravel app from http://localhost/ when the project lives directly in XAMPP's htdocs.
+# Every request is routed into /public, so .env, vendor/, app/ … are never reachable from the web.
+# (Not needed with `php artisan serve` or a proper virtual host pointing at /public.)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Visitor typed /public/... → send them to the clean URL (THE_REQUEST ignores internal rewrites, so no loop)
+    RewriteCond %{THE_REQUEST} \s/public(/|\s|\?)
+    RewriteRule ^public/?(.*)$ /$1 [R=302,L]
+
+    # Everything else is handled by /public (public/.htaccess then routes to index.php)
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
